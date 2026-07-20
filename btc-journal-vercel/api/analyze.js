@@ -84,8 +84,11 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
-          maxOutputTokens: 1200,
+          maxOutputTokens: 8192,
           temperature: 0.7,
+          thinkingConfig: {
+            thinkingBudget: 0,
+          },
         },
       }),
       signal: AbortSignal.timeout(30000),
@@ -98,8 +101,11 @@ export default async function handler(req, res) {
 
     const data = await response.json();
     const text =
-      data?.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("\n") ||
-      "Analysis unavailable.";
+      data?.candidates?.[0]?.content?.parts
+        ?.filter((p) => !p.thought)
+        ?.map((p) => p.text || "")
+        .join("\n")
+        .trim() || "Analysis unavailable.";
 
     // ── Record successful request for rate limiting ──
     timestamps.push(now);

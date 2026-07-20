@@ -4,11 +4,6 @@
 let cache = { data: null, timestamp: 0 };
 const CACHE_TTL = 60_000; // 60 seconds — rankings don't change fast
 
-const STABLECOINS = new Set([
-  "tether", "usd-coin", "dai", "first-digital-usd", "ethena-usde",
-  "usds", "usdd", "frax", "true-usd", "paxos-standard",
-  "paypal-usd", "gemini-dollar", "binance-usd",
-]);
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -22,10 +17,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Fetch 30 to have room after filtering stablecoins
+    // Fetch top 20 by market cap
     const response = await fetch(
       "https://api.coingecko.com/api/v3/coins/markets?" +
-        "vs_currency=usd&order=market_cap_desc&per_page=30&page=1" +
+        "vs_currency=usd&order=market_cap_desc&per_page=20&page=1" +
         "&sparkline=false&price_change_percentage=1h,24h,7d",
       { signal: AbortSignal.timeout(10000) }
     );
@@ -36,7 +31,6 @@ export default async function handler(req, res) {
 
     // Filter stablecoins, take top 20
     const coins = raw
-      .filter((c) => !STABLECOINS.has(c.id))
       .slice(0, 20)
       .map((c, i) => ({
         rank: i + 1,

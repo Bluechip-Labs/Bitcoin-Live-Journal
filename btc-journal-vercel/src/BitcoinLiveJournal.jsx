@@ -225,13 +225,12 @@ function useTopCoins() {
       // Fallback: direct CoinGecko
       if (!data) {
         const res = await fetch(
-          "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=25&page=1&sparkline=false&price_change_percentage=1h,24h,7d",
+          "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=false&price_change_percentage=1h,24h,7d",
           { signal: AbortSignal.timeout(8000) }
         );
         if (!res.ok) throw new Error("fetch failed");
         const raw = await res.json();
-        const stables = new Set(["tether","usd-coin","dai","first-digital-usd","ethena-usde","usds","usdd","frax","true-usd","binance-usd","paypal-usd"]);
-        data = { coins: raw.filter(c => !stables.has(c.id)).slice(0, 20).map((c, i) => ({
+        data = { coins: raw.slice(0, 20).map((c, i) => ({
           rank: i + 1, id: c.id, symbol: c.symbol?.toUpperCase(), name: c.name,
           price: c.current_price, change24h: c.price_change_percentage_24h,
           change7d: c.price_change_percentage_7d_in_currency, marketCap: c.market_cap, image: c.image,
@@ -440,11 +439,7 @@ export default function BitcoinLiveJournal() {
             {priceChange >= 0 ? "+" : ""}{priceChange.toFixed(2)}%
           </span>
           <span style={{ fontSize: 11, color: "#555", fontFamily: "'JetBrains Mono', monospace" }}>{drawdownFromATH}% from ATH</span>
-          {live.ethPrice && (
-            <span style={{ fontSize: 11, color: "#888", fontFamily: "'JetBrains Mono', monospace" }}>
-              ETH ${live.ethPrice.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-            </span>
-          )}
+
         </div>
 
         {/* ── Live Status Bar ── */}
@@ -554,7 +549,7 @@ export default function BitcoinLiveJournal() {
                 <StatBox small label="24h High" value={`$${live.btcHigh24h.toLocaleString(undefined, {maximumFractionDigits: 0})}`} color="#22c55e" />
                 <StatBox small label="24h Low" value={`$${live.btcLow24h.toLocaleString(undefined, {maximumFractionDigits: 0})}`} color="#ef4444" />
                 <StatBox small label="Mkt Cap" value={live.btcMarketCap ? `$${(live.btcMarketCap / 1e12).toFixed(2)}T` : "—"} />
-                <StatBox small label="ETH Price" value={live.ethPrice ? `$${live.ethPrice.toLocaleString(undefined, {maximumFractionDigits: 0})}` : "—"} color="#888" />
+
               </div>
             )}
 
@@ -590,8 +585,8 @@ export default function BitcoinLiveJournal() {
                   <YAxis tick={{ fill: "#555", fontSize: 10 }} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend wrapperStyle={{ fontSize: 10 }} />
-                  <Line type="monotone" dataKey="Cycle 2 (2016)" stroke="#666" strokeWidth={1.5} dot={false} strokeDasharray="4 4" />
-                  <Line type="monotone" dataKey="Cycle 3 (2020)" stroke="#888" strokeWidth={1.5} dot={false} strokeDasharray="4 4" />
+                  <Line type="monotone" dataKey="Cycle 2 (2016)" stroke="#38bdf8" strokeWidth={1.5} dot={false} strokeDasharray="6 3" />
+                  <Line type="monotone" dataKey="Cycle 3 (2020)" stroke="#a78bfa" strokeWidth={1.5} dot={false} strokeDasharray="6 3" />
                   <Line type="monotone" dataKey="Cycle 4 (2024)" stroke="#F7931A" strokeWidth={2.5} dot={false} />
                   <ReferenceLine x="M+18" stroke="rgba(239,68,68,0.3)" strokeDasharray="3 3" label={{ value: "Avg Peak", fill: "#ef4444", fontSize: 9 }} />
                 </LineChart>
@@ -1123,7 +1118,7 @@ export default function BitcoinLiveJournal() {
           })}
           <div style={{ fontSize: 8, color: "#333", textAlign: "center", marginTop: 8,
             fontFamily: "'JetBrains Mono', monospace" }}>
-            Excludes stablecoins • 60s refresh
+            Auto-refresh • 60s
           </div>
         </div>
       </aside>

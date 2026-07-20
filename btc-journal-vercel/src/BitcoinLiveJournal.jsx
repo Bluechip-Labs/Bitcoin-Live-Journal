@@ -971,6 +971,8 @@ export default function BitcoinLiveJournal() {
                 </>
               )}
 
+            </Card>
+
             <Card>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <SectionTitle>Live Data Snapshot</SectionTitle>

@@ -205,6 +205,52 @@ function useLivePrice(intervalMs) {
   return { ...data, countdown, refetch: fetchPrice };
 }
 
+
+
+// ─── Top Coins Hook ─────────────────────────────────────────────────────────
+
+function useTopCoins() {
+  const [coins, setCoins] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchCoins = useCallback(async () => {
+    try {
+      // Try proxy first
+      let data;
+      try {
+        const res = await fetch("/api/coins", { signal: AbortSignal.timeout(5000) });
+        if (res.ok) { data = await res.json(); }
+      } catch {}
+
+      // Fallback: direct CoinGecko
+      if (!data) {
+        const res = await fetch(
+          "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=25&page=1&sparkline=false&price_change_percentage=1h,24h,7d",
+          { signal: AbortSignal.timeout(8000) }
+        );
+        if (!res.ok) throw new Error("fetch failed");
+        const raw = await res.json();
+        const stables = new Set(["tether","usd-coin","dai","first-digital-usd","ethena-usde","usds","usdd","frax","true-usd","binance-usd","paypal-usd"]);
+        data = { coins: raw.filter(c => !stables.has(c.id)).slice(0, 20).map((c, i) => ({
+          rank: i + 1, id: c.id, symbol: c.symbol?.toUpperCase(), name: c.name,
+          price: c.current_price, change24h: c.price_change_percentage_24h,
+          change7d: c.price_change_percentage_7d_in_currency, marketCap: c.market_cap, image: c.image,
+        })) };
+      }
+      setCoins(data.coins || []);
+    } catch { /* keep existing data */ }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchCoins();
+    const interval = setInterval(fetchCoins, 60000); // refresh every 60s
+    return () => clearInterval(interval);
+  }, [fetchCoins]);
+
+  return { coins, loading };
+}
+
 // ─── Main App ───────────────────────────────────────────────────────────────
 
 export default function BitcoinLiveJournal() {
@@ -229,6 +275,7 @@ export default function BitcoinLiveJournal() {
   const [priceFlash, setPriceFlash] = useState(null); // "up" | "down" | null
 
   const live = useLivePrice(refreshInterval);
+  const topCoins = useTopCoins();
 
   const currentPrice = live.btcPrice || 64779;
   const priceChange = live.btcChange24h != null ? live.btcChange24h : 0;
@@ -364,7 +411,7 @@ export default function BitcoinLiveJournal() {
   );
 
   return (
-    <div style={{ fontFamily: "'Inter', -apple-system, sans-serif", background: "#0a0a0a", color: "#d4d4d4", minHeight: "100vh", maxWidth: 900, margin: "0 auto", padding: "0 16px 40px" }}>
+    <div style={{ fontFamily: "'Inter', -apple-system, sans-serif", background: "#0a0a0a", color: "#d4d4d4", minHeight: "100vh", maxWidth: 1180, margin: "0 auto", padding: "0 16px 40px" }}>
 
       {/* ═══ HEADER ═══ */}
       <header style={{ padding: "24px 0 14px", borderBottom: "1px solid rgba(247,147,26,0.15)" }}>
@@ -486,7 +533,11 @@ export default function BitcoinLiveJournal() {
         {tabs.map(t => <TabButton key={t.id} active={tab === t.id} onClick={() => setTab(t.id)} icon={t.icon}>{t.label}</TabButton>)}
       </nav>
 
-      <main style={{ paddingTop: 18 }}>
+      {/* ═══ CONTENT + SIDEBAR LAYOUT ═══ */}
+      <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+
+      {/* ═══ MAIN CONTENT ═══ */}
+      <main style={{ paddingTop: 18, flex: 1, minWidth: 0 }}>
 
         {/* ═══════════════ DASHBOARD ═══════════════ */}
         {tab === "dashboard" && (
@@ -1024,6 +1075,61 @@ export default function BitcoinLiveJournal() {
 
       </main>
 
+      {/* ═══ COIN SIDEBAR ═══ */}
+      <aside style={{
+        width: 210, flexShrink: 0, paddingTop: 18, position: "sticky", top: 10,
+        maxHeight: "calc(100vh - 20px)", overflowY: "auto",
+        display: typeof window !== "undefined" && window.innerWidth < 768 ? "none" : "block",
+      }}>
+        <div style={{
+          background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
+          borderRadius: 8, padding: "12px 10px",
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#e5e5e5", textTransform: "uppercase",
+            letterSpacing: "0.06em", marginBottom: 10, paddingBottom: 8,
+            borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+            Top 20 by Market Cap
+          </div>
+          {topCoins.loading && <div style={{ fontSize: 10, color: "#555", textAlign: "center", padding: 12 }}>Loading...</div>}
+          {topCoins.coins.map((coin, i) => {
+            const isPositive = coin.change24h >= 0;
+            return (
+              <div key={coin.id} style={{
+                display: "flex", alignItems: "center", gap: 6, padding: "5px 4px",
+                borderBottom: "1px solid rgba(255,255,255,0.03)",
+                background: i === 0 ? "rgba(247,147,26,0.05)" : "transparent",
+              }}>
+                <span style={{ fontSize: 9, color: "#555", fontFamily: "'JetBrains Mono', monospace",
+                  width: 16, textAlign: "right", flexShrink: 0 }}>{coin.rank}</span>
+                <img src={coin.image} alt="" width={14} height={14}
+                  style={{ borderRadius: "50%", flexShrink: 0 }}
+                  onError={e => { e.target.style.display = "none"; }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#ddd", lineHeight: 1.2 }}>{coin.symbol}</div>
+                </div>
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: "#ccc", fontFamily: "'JetBrains Mono', monospace" }}>
+                    {coin.price >= 1000 ? `$${(coin.price/1000).toFixed(1)}K`
+                      : coin.price >= 1 ? `$${coin.price.toFixed(2)}`
+                      : `$${coin.price.toFixed(4)}`}
+                  </div>
+                  <div style={{ fontSize: 9, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace",
+                    color: isPositive ? "#22c55e" : "#ef4444" }}>
+                    {isPositive ? "+" : ""}{coin.change24h?.toFixed(1)}%
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          <div style={{ fontSize: 8, color: "#333", textAlign: "center", marginTop: 8,
+            fontFamily: "'JetBrains Mono', monospace" }}>
+            Excludes stablecoins • 60s refresh
+          </div>
+        </div>
+      </aside>
+
+      </div>{/* end content+sidebar flex */}
+
       {/* ═══ FOOTER ═══ */}
       <footer style={{ marginTop: 28, padding: "14px 0", borderTop: "1px solid rgba(255,255,255,0.04)", fontSize: 10, color: "#444", textAlign: "center", lineHeight: 1.6 }}>
         <p style={{ margin: 0 }}>Educational and informational purposes only. Not financial advice. Past performance ≠ future results.</p>
@@ -1044,6 +1150,11 @@ export default function BitcoinLiveJournal() {
         * { box-sizing: border-box; }
         ::-webkit-scrollbar { height: 4px; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        @media (max-width: 850px) {
+          aside { display: none !important; }
+        }
+        aside::-webkit-scrollbar { width: 3px; }
+        aside::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
       `}</style>
     </div>
   );

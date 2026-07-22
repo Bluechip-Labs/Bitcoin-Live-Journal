@@ -108,6 +108,47 @@ const ExtLink = ({ href, children }) => (
   <a href={href} target="_blank" rel="noopener noreferrer" style={{ color: "#F7931A", textDecoration: "none", borderBottom: "1px dotted rgba(247,147,26,0.4)", fontSize: "inherit" }}>{children}</a>
 );
 
+
+const BitboChart = ({ slug, title, height }) => (
+  <div style={{ marginBottom: 2 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+      <span style={{ fontSize: 11, fontWeight: 600, color: "#ccc" }}>{title}</span>
+      <a href={`https://charts.bitbo.io/${slug}/`} target="_blank" rel="noopener noreferrer"
+        style={{ fontSize: 9, color: "#F7931A", textDecoration: "none", fontFamily: "'JetBrains Mono', monospace" }}>
+        Open in Bitbo ↗
+      </a>
+    </div>
+    <div style={{ background: "rgba(0,0,0,0.3)", borderRadius: 6, overflow: "hidden", border: "1px solid rgba(255,255,255,0.06)" }}>
+      <iframe
+        src={`https://charts.bitbo.io/${slug}/`}
+        title={title}
+        width="100%"
+        height={height || 400}
+        style={{ border: "none", display: "block", borderRadius: 6 }}
+        loading="lazy"
+        sandbox="allow-scripts allow-same-origin"
+      />
+    </div>
+  </div>
+);
+
+
+
+const ChartLink = ({ href, title, desc, tag }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer" style={{
+    display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
+    background: "rgba(0,0,0,0.3)", borderRadius: 6, border: "1px solid rgba(255,255,255,0.05)",
+    textDecoration: "none", transition: "border-color 0.2s",
+  }}>
+    <span style={{ fontSize: 18, flexShrink: 0 }}>📊</span>
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ fontSize: 12, fontWeight: 600, color: "#ddd" }}>{title}</div>
+      <div style={{ fontSize: 10, color: "#666", marginTop: 2, lineHeight: 1.4 }}>{desc}</div>
+    </div>
+    {tag && <span style={{ fontSize: 9, color: "#F7931A", fontWeight: 700, padding: "2px 6px", background: "rgba(247,147,26,0.1)", borderRadius: 3, flexShrink: 0 }}>{tag}</span>}
+    <span style={{ color: "#555", fontSize: 12, flexShrink: 0 }}>↗</span>
+  </a>
+);
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
@@ -392,11 +433,10 @@ export default function BitcoinLiveJournal() {
   const tabs = [
     { id: "dashboard", label: "Dashboard", icon: "◈" },
     { id: "technicals", label: "Technicals", icon: "⊞" },
-    { id: "onchain", label: "On-Chain", icon: "⛓" },
-    { id: "cycles", label: "Cycles", icon: "↻" },
-    { id: "drawdowns", label: "Bears", icon: "▼" },
-    { id: "seasonality", label: "Seasonal", icon: "◐" },
     { id: "scenarios", label: "Scenarios", icon: "⟁" },
+    { id: "cycles", label: "Cycles", icon: "↻" },
+    { id: "seasonality", label: "Seasonal", icon: "◐" },
+    { id: "onchain", label: "On-Chain", icon: "⛓" },
     { id: "journal", label: "AI Journal", icon: "✎" },
   ];
 
@@ -680,6 +720,41 @@ export default function BitcoinLiveJournal() {
                 </table>
               </div>
             </Card>
+
+            <Card>
+              <SectionTitle sub="12-month returns after touching the 200-week moving average">200-WMA Historical Returns</SectionTitle>
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={WMA_BOUNCES} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <CartesianGrid stroke="rgba(255,255,255,0.04)" />
+                  <XAxis dataKey="year" tick={{ fill: "#666", fontSize: 10 }} />
+                  <YAxis tick={{ fill: "#555", fontSize: 10 }} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="returnPct" name="12-Mo Return" radius={[4, 4, 0, 0]}>
+                    {WMA_BOUNCES.map((_, i) => <Cell key={i} fill={["#22c55e", "#86efac", "#4ade80", "#16a34a"][i]} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+              <p style={{ fontSize: 11, color: "#F7931A", marginTop: 6, textAlign: "center", fontWeight: 600 }}>BTC spent only ~4% of trading history below the 200-WMA. June 2026 = 5th touch ever.</p>
+            </Card>
+
+            {/* ── Bitbo Pro Charts ── */}
+            <Card>
+              <SectionTitle sub="Live professional charts from Bitbo.io — click any chart title to open full view">Professional Trading Charts</SectionTitle>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 14 }}>
+                <BitboChart slug="daily-rsi" title="Daily RSI" height={420} />
+                <BitboChart slug="macd" title="MACD" height={420} />
+                <BitboChart slug="bollinger-bands" title="Bollinger Bands" height={420} />
+                <BitboChart slug="50-200-day-ma" title="50/200 Day Moving Averages" height={420} />
+                <BitboChart slug="ma-200w" title="200 Week Moving Average" height={420} />
+                <BitboChart slug="mayermultiple" title="Mayer Multiple" height={420} />
+                <BitboChart slug="pi-cycle-top" title="Pi Cycle Top Indicator" height={420} />
+                <BitboChart slug="power-law-oscillator" title="Power Law Oscillator" height={420} />
+                <BitboChart slug="mvrv-z-score" title="MVRV Z-Score" height={420} />
+                <BitboChart slug="price-drawdown-from-all-time-high" title="Drawdown from ATH" height={420} />
+                <BitboChart slug="funding-rate" title="BTC Funding Rate" height={420} />
+                <BitboChart slug="liquidation-heatmap" title="Liquidation Heatmap" height={420} />
+              </div>
+            </Card>
           </div>
         )}
 
@@ -744,20 +819,17 @@ export default function BitcoinLiveJournal() {
               <p style={{ fontSize: 10, color: "#555", marginTop: 6 }}>Source: <ExtLink href="https://bitcoinfoundation.org/news/crypto-companies-news/strategy-banks-btc-index/">Bitcoin Foundation</ExtLink> • Michael Saylor / Phong Le</p>
             </Card>
 
+            {/* On-Chain Charts */}
             <Card>
-              <SectionTitle sub="12-month returns after touching the 200-week moving average">200-WMA Historical Returns</SectionTitle>
-              <ResponsiveContainer width="100%" height={180}>
-                <BarChart data={WMA_BOUNCES} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid stroke="rgba(255,255,255,0.04)" />
-                  <XAxis dataKey="year" tick={{ fill: "#666", fontSize: 10 }} />
-                  <YAxis tick={{ fill: "#555", fontSize: 10 }} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="returnPct" name="12-Mo Return" radius={[4, 4, 0, 0]}>
-                    {WMA_BOUNCES.map((_, i) => <Cell key={i} fill={["#22c55e", "#86efac", "#4ade80", "#16a34a"][i]} />)}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-              <p style={{ fontSize: 11, color: "#F7931A", marginTop: 6, textAlign: "center", fontWeight: 600 }}>BTC spent only ~4% of trading history below the 200-WMA. June 2026 = 5th touch ever.</p>
+              <SectionTitle sub="Live on-chain analytics via Bitbo Charts">On-Chain Charts</SectionTitle>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <ChartLink href="https://charts.bitbo.io/tx-per-day/" title="Daily Transaction Volume" desc="Number of confirmed Bitcoin transactions per day" tag="LIVE" />
+                <ChartLink href="https://charts.bitbo.io/supply-in-profit/" title="Supply in Profit" desc="Percentage of circulating BTC held at a profit vs loss" />
+                <ChartLink href="https://charts.bitbo.io/nupl/" title="NUPL (Net Unrealized Profit/Loss)" desc="Market-wide profitability gauge — capitulation to euphoria" />
+                <ChartLink href="https://charts.bitbo.io/mvrv-zscore/" title="MVRV Z-Score" desc="Market value vs realized value — identifies over/undervaluation" />
+                <ChartLink href="https://charts.bitbo.io/puell-multiple/" title="Puell Multiple" desc="Miner revenue relative to 365-day average — miner stress indicator" />
+                <ChartLink href="https://charts.bitbo.io/sopr/" title="SOPR (Spent Output Profit Ratio)" desc="Are coins being sold at profit or loss? Key reversal signal" />
+              </div>
             </Card>
           </div>
         )}
@@ -823,42 +895,6 @@ export default function BitcoinLiveJournal() {
           </div>
         )}
 
-        {/* ═══════════════ BEARS ═══════════════ */}
-        {tab === "drawdowns" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <Card>
-              <SectionTitle sub="Peak-to-bottom drop in every bear cycle">How Far Does BTC Crash?</SectionTitle>
-              {dynamicBearDrawdowns.map((b, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                  <div style={{ width: 60, fontSize: 12, fontWeight: 700, color: i === 4 ? "#F7931A" : "#ccc", fontFamily: "'JetBrains Mono', monospace" }}>{b.year}</div>
-                  <div style={{ flex: 1, height: 30, background: "rgba(255,255,255,0.03)", borderRadius: 4, overflow: "hidden" }}>
-                    <div style={{ width: `${b.drawdown}%`, height: "100%", background: `linear-gradient(90deg, ${b.color}cc, ${b.color}88)`, borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "flex-end", paddingRight: 8, transition: "width 1s ease" }}>
-                      <span style={{ fontSize: 13, fontWeight: 800, color: "#fff", fontFamily: "'JetBrains Mono', monospace" }}>-{b.drawdown}%{i === 4 ? " live" : ""}</span>
-                    </div>
-                  </div>
-                  <div style={{ width: 50, textAlign: "right", fontSize: 10, color: "#666", fontFamily: "'JetBrains Mono', monospace" }}>{b.months ? `${b.months}mo` : "—"}</div>
-                </div>
-              ))}
-              <p style={{ fontSize: 11, color: "#666", marginTop: 8, textAlign: "center" }}>93% → 86% → 84% → 77% → {Math.round(currentDrawdownPct)}% live. Diminishing severity — but this cycle may not be finished.</p>
-            </Card>
-            <Card>
-              <SectionTitle sub="From ATH of $126K">Bear Case Scenarios</SectionTitle>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {[
-                  { label: "Bull (low is in)", pct: 52, price: "$59K", color: "#22c55e", border: "rgba(34,197,94,0.3)" },
-                  { label: "Base (historical)", pct: 64, price: "$45K", color: "#F7931A", border: "rgba(247,147,26,0.3)" },
-                  { label: "Bear (macro shock)", pct: 70, price: "$38K", color: "#ef4444", border: "rgba(239,68,68,0.3)" },
-                ].map((s, i) => (
-                  <div key={i} style={{ flex: 1, minWidth: 130, padding: 14, textAlign: "center", background: "rgba(0,0,0,0.3)", borderRadius: 6, border: `1px solid ${s.border}` }}>
-                    <div style={{ fontSize: 9, color: "#666", textTransform: "uppercase", marginBottom: 6 }}>{s.label}</div>
-                    <div style={{ fontSize: 26, fontWeight: 800, color: s.color, fontFamily: "'JetBrains Mono', monospace" }}>-{s.pct}%</div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: "#ccc", marginTop: 4 }}>{s.price}</div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </div>
-        )}
 
         {/* ═══════════════ SEASONALITY ═══════════════ */}
         {tab === "seasonality" && (
@@ -1063,6 +1099,65 @@ export default function BitcoinLiveJournal() {
                     <li>Grayscale: "slow bull" institutional era</li>
                   </ul>
                 </div>
+              </div>
+            </Card>
+
+            {/* ── Market Indicators from Bitbo ── */}
+            <Card>
+              <SectionTitle sub="Live sentiment and on-chain indicators from Bitbo.io">Market Indicators</SectionTitle>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 14 }}>
+                <BitboChart slug="fear-greed" title="Fear & Greed Index" height={420} />
+                <BitboChart slug="net-unrealized-profit-loss" title="NUPL (Net Unrealized Profit/Loss)" height={420} />
+                <BitboChart slug="cycle-repeat" title="Cycle Repeat Overlay" height={420} />
+                <BitboChart slug="rainbow" title="Rainbow Chart (Halving)" height={420} />
+                <BitboChart slug="reserve-risk" title="Reserve Risk" height={420} />
+                <BitboChart slug="puell-multiple" title="Puell Multiple" height={420} />
+              </div>
+            </Card>
+
+                        {/* ── Key Indicator Charts ── */}
+            <Card>
+              <SectionTitle sub="Essential cycle and sentiment indicators via Bitbo Charts">Market Indicators</SectionTitle>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <ChartLink href="https://charts.bitbo.io/fear-greed/" title="Fear & Greed Index" desc="Sentiment analysis — price colored by fear (red) vs greed (green)" tag="SENTIMENT" />
+                <ChartLink href="https://charts.bitbo.io/monthly-rsi/" title="Relative Strength Index (RSI)" desc="Momentum indicator — overbought vs oversold across 12-month window" tag="MOMENTUM" />
+                <ChartLink href="https://charts.bitbo.io/supply-in-profit/" title="Supply in Profit" desc="% of BTC supply held at a profit — key cycle position signal" tag="ON-CHAIN" />
+                <ChartLink href="https://charts.bitbo.io/long-term-power-law/" title="Power Law Model" desc="Long-term growth corridor — are we above or below fair value?" tag="VALUATION" />
+                <ChartLink href="https://charts.bitbo.io/power-law-oscillator/" title="Power Law Oscillator" desc="Under/oversold relative to power law fit — tops and bottoms" tag="VALUATION" />
+                <ChartLink href="https://charts.bitbo.io/nupl/" title="NUPL" desc="Net unrealized profit/loss — maps euphoria to capitulation" tag="ON-CHAIN" />
+              </div>
+            </Card>
+
+            {/* ── Bear Market History (moved from Bears tab) ── */}
+            <Card>
+              <SectionTitle sub="Peak-to-bottom drop in every bear cycle">How Far Does BTC Crash?</SectionTitle>
+              {dynamicBearDrawdowns.map((b, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                  <div style={{ width: 60, fontSize: 12, fontWeight: 700, color: i === 4 ? "#F7931A" : "#ccc", fontFamily: "'JetBrains Mono', monospace" }}>{b.year}</div>
+                  <div style={{ flex: 1, height: 30, background: "rgba(255,255,255,0.03)", borderRadius: 4, overflow: "hidden" }}>
+                    <div style={{ width: `${b.drawdown}%`, height: "100%", background: `linear-gradient(90deg, ${b.color}cc, ${b.color}88)`, borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "flex-end", paddingRight: 8, transition: "width 1s ease" }}>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: "#fff", fontFamily: "'JetBrains Mono', monospace" }}>-{b.drawdown}%{i === 4 ? " live" : ""}</span>
+                    </div>
+                  </div>
+                  <div style={{ width: 50, textAlign: "right", fontSize: 10, color: "#666", fontFamily: "'JetBrains Mono', monospace" }}>{b.months ? `${b.months}mo` : "—"}</div>
+                </div>
+              ))}
+              <p style={{ fontSize: 11, color: "#666", marginTop: 8, textAlign: "center" }}>93% → 86% → 84% → 77% → {Math.round(currentDrawdownPct)}% live. Diminishing severity — but this cycle may not be finished.</p>
+            </Card>
+            <Card>
+              <SectionTitle sub="From ATH of $126K">Bear Case Scenarios</SectionTitle>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {[
+                  { label: "Bull (low is in)", pct: 52, price: "$59K", color: "#22c55e", border: "rgba(34,197,94,0.3)" },
+                  { label: "Base (historical)", pct: 64, price: "$45K", color: "#F7931A", border: "rgba(247,147,26,0.3)" },
+                  { label: "Bear (macro shock)", pct: 70, price: "$38K", color: "#ef4444", border: "rgba(239,68,68,0.3)" },
+                ].map((s, i) => (
+                  <div key={i} style={{ flex: 1, minWidth: 130, padding: 14, textAlign: "center", background: "rgba(0,0,0,0.3)", borderRadius: 6, border: `1px solid ${s.border}` }}>
+                    <div style={{ fontSize: 9, color: "#666", textTransform: "uppercase", marginBottom: 6 }}>{s.label}</div>
+                    <div style={{ fontSize: 26, fontWeight: 800, color: s.color, fontFamily: "'JetBrains Mono', monospace" }}>-{s.pct}%</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#ccc", marginTop: 4 }}>{s.price}</div>
+                  </div>
+                ))}
               </div>
             </Card>
           </div>

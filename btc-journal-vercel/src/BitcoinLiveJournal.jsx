@@ -109,28 +109,6 @@ const ExtLink = ({ href, children }) => (
 );
 
 
-const BitboChart = ({ slug, title, height }) => (
-  <div style={{ marginBottom: 2 }}>
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-      <span style={{ fontSize: 11, fontWeight: 600, color: "#ccc" }}>{title}</span>
-      <a href={`https://charts.bitbo.io/${slug}/`} target="_blank" rel="noopener noreferrer"
-        style={{ fontSize: 9, color: "#F7931A", textDecoration: "none", fontFamily: "'JetBrains Mono', monospace" }}>
-        Open in Bitbo ↗
-      </a>
-    </div>
-    <div style={{ background: "rgba(0,0,0,0.3)", borderRadius: 6, overflow: "hidden", border: "1px solid rgba(255,255,255,0.06)" }}>
-      <iframe
-        src={`https://charts.bitbo.io/${slug}/`}
-        title={title}
-        width="100%"
-        height={height || 400}
-        style={{ border: "none", display: "block", borderRadius: 6 }}
-        loading="lazy"
-        sandbox="allow-scripts allow-same-origin"
-      />
-    </div>
-  </div>
-);
 
 
 
@@ -741,18 +719,20 @@ export default function BitcoinLiveJournal() {
             <Card>
               <SectionTitle sub="Live professional charts from Bitbo.io — click any chart title to open full view">Professional Trading Charts</SectionTitle>
               <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 14 }}>
-                <BitboChart slug="daily-rsi" title="Daily RSI" height={420} />
-                <BitboChart slug="macd" title="MACD" height={420} />
-                <BitboChart slug="bollinger-bands" title="Bollinger Bands" height={420} />
-                <BitboChart slug="50-200-day-ma" title="50/200 Day Moving Averages" height={420} />
-                <BitboChart slug="ma-200w" title="200 Week Moving Average" height={420} />
-                <BitboChart slug="mayermultiple" title="Mayer Multiple" height={420} />
-                <BitboChart slug="pi-cycle-top" title="Pi Cycle Top Indicator" height={420} />
-                <BitboChart slug="power-law-oscillator" title="Power Law Oscillator" height={420} />
-                <BitboChart slug="mvrv-z-score" title="MVRV Z-Score" height={420} />
-                <BitboChart slug="price-drawdown-from-all-time-high" title="Drawdown from ATH" height={420} />
-                <BitboChart slug="funding-rate" title="BTC Funding Rate" height={420} />
-                <BitboChart slug="liquidation-heatmap" title="Liquidation Heatmap" height={420} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                  <ChartLink href="https://www.tradingview.com/symbols/BTCUSD/technicals/" title="Daily RSI" desc="TradingView real-time RSI & oscillators" />
+                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/macd/" title="MACD" desc="Moving average convergence/divergence" />
+                  <ChartLink href="https://www.tradingview.com/symbols/BTCUSD/" title="Bollinger Bands" desc="Volatility bands on TradingView" />
+                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/200-day-moving-average-heatmap/" title="50/200 Day MAs" desc="Key moving averages with heatmap" />
+                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/200-week-moving-average-heatmap/" title="200 Week MA" desc="Long-term cycle support level" />
+                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/mayer-multiple/" title="Mayer Multiple" desc="Price relative to 200-day MA" />
+                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/pi-cycle-top-indicator/" title="Pi Cycle Top" desc="111DMA & 350DMA×2 crossover" />
+                  <ChartLink href="https://charts.bitbo.io/power-law-oscillator/" title="Power Law Oscillator" desc="Under/oversold vs power law" />
+                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/mvrv-zscore/" title="MVRV Z-Score" desc="Over/undervaluation signal" />
+                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/bitcoin-drawdown-from-ath/" title="Drawdown from ATH" desc="Current % drop from all-time high" />
+                  <ChartLink href="https://www.coinglass.com/FundingRate" title="BTC Funding Rate" desc="Perpetual futures funding rates" />
+                  <ChartLink href="https://www.coinglass.com/LiquidationHeatMap" title="Liquidation Heatmap" desc="Where leveraged positions cluster" />
+                </div>
               </div>
             </Card>
           </div>
@@ -823,12 +803,12 @@ export default function BitcoinLiveJournal() {
             <Card>
               <SectionTitle sub="Live on-chain analytics via Bitbo Charts">On-Chain Charts</SectionTitle>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <ChartLink href="https://charts.bitbo.io/tx-per-day/" title="Daily Transaction Volume" desc="Number of confirmed Bitcoin transactions per day" tag="LIVE" />
-                <ChartLink href="https://charts.bitbo.io/supply-in-profit/" title="Supply in Profit" desc="Percentage of circulating BTC held at a profit vs loss" />
-                <ChartLink href="https://charts.bitbo.io/nupl/" title="NUPL (Net Unrealized Profit/Loss)" desc="Market-wide profitability gauge — capitulation to euphoria" />
-                <ChartLink href="https://charts.bitbo.io/mvrv-zscore/" title="MVRV Z-Score" desc="Market value vs realized value — identifies over/undervaluation" />
-                <ChartLink href="https://charts.bitbo.io/puell-multiple/" title="Puell Multiple" desc="Miner revenue relative to 365-day average — miner stress indicator" />
-                <ChartLink href="https://charts.bitbo.io/sopr/" title="SOPR (Spent Output Profit Ratio)" desc="Are coins being sold at profit or loss? Key reversal signal" />
+                <ChartLink href="https://www.blockchain.com/explorer/charts/n-transactions" title="Daily Transaction Volume" desc="Number of confirmed Bitcoin transactions per day" tag="LIVE" />
+                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/bitcoin-profitable-days/" title="Supply in Profit" desc="Percentage of circulating BTC held at a profit vs loss" />
+                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/nupl/" title="NUPL (Net Unrealized Profit/Loss)" desc="Market-wide profitability gauge — capitulation to euphoria" />
+                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/mvrv-zscore/" title="MVRV Z-Score" desc="Market value vs realized value — identifies over/undervaluation" />
+                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/puell-multiple/" title="Puell Multiple" desc="Miner revenue relative to 365-day average — miner stress indicator" />
+                <ChartLink href="https://charts.checkonchain.com/btconchain/unrealised/sopr_simple/sopr_simple_light.html" title="SOPR (Spent Output Profit Ratio)" desc="Are coins being sold at profit or loss? Key reversal signal" />
               </div>
             </Card>
           </div>
@@ -1106,12 +1086,14 @@ export default function BitcoinLiveJournal() {
             <Card>
               <SectionTitle sub="Live sentiment and on-chain indicators from Bitbo.io">Market Indicators</SectionTitle>
               <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 14 }}>
-                <BitboChart slug="fear-greed" title="Fear & Greed Index" height={420} />
-                <BitboChart slug="net-unrealized-profit-loss" title="NUPL (Net Unrealized Profit/Loss)" height={420} />
-                <BitboChart slug="cycle-repeat" title="Cycle Repeat Overlay" height={420} />
-                <BitboChart slug="rainbow" title="Rainbow Chart (Halving)" height={420} />
-                <BitboChart slug="reserve-risk" title="Reserve Risk" height={420} />
-                <BitboChart slug="puell-multiple" title="Puell Multiple" height={420} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                  <ChartLink href="https://alternative.me/crypto/fear-and-greed-index/" title="Fear & Greed Index" desc="Live sentiment gauge — fear to greed" tag="SENTIMENT" />
+                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/nupl/" title="NUPL" desc="Net unrealized profit/loss" tag="ON-CHAIN" />
+                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/cycle-repeat/" title="Cycle Repeat Overlay" desc="Current cycle vs historical overlays" tag="CYCLE" />
+                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/bitcoin-rainbow-chart/" title="Rainbow Chart" desc="Logarithmic regression bands" tag="VALUATION" />
+                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/reserve-risk/" title="Reserve Risk" desc="Confidence vs price — buy signal indicator" tag="ON-CHAIN" />
+                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/puell-multiple/" title="Puell Multiple" desc="Miner revenue stress indicator" tag="MINING" />
+                </div>
               </div>
             </Card>
 
@@ -1119,12 +1101,12 @@ export default function BitcoinLiveJournal() {
             <Card>
               <SectionTitle sub="Essential cycle and sentiment indicators via Bitbo Charts">Market Indicators</SectionTitle>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <ChartLink href="https://charts.bitbo.io/fear-greed/" title="Fear & Greed Index" desc="Sentiment analysis — price colored by fear (red) vs greed (green)" tag="SENTIMENT" />
-                <ChartLink href="https://charts.bitbo.io/monthly-rsi/" title="Relative Strength Index (RSI)" desc="Momentum indicator — overbought vs oversold across 12-month window" tag="MOMENTUM" />
-                <ChartLink href="https://charts.bitbo.io/supply-in-profit/" title="Supply in Profit" desc="% of BTC supply held at a profit — key cycle position signal" tag="ON-CHAIN" />
-                <ChartLink href="https://charts.bitbo.io/long-term-power-law/" title="Power Law Model" desc="Long-term growth corridor — are we above or below fair value?" tag="VALUATION" />
+                <ChartLink href="https://alternative.me/crypto/fear-and-greed-index/" title="Fear & Greed Index" desc="Sentiment analysis — price colored by fear (red) vs greed (green)" tag="SENTIMENT" />
+                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/relative-strength-index/" title="Relative Strength Index (RSI)" desc="Momentum indicator — overbought vs oversold across 12-month window" tag="MOMENTUM" />
+                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/bitcoin-profitable-days/" title="Supply in Profit" desc="% of BTC supply held at a profit — key cycle position signal" tag="ON-CHAIN" />
+                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/bitcoin-power-law/" title="Power Law Model" desc="Long-term growth corridor — are we above or below fair value?" tag="VALUATION" />
                 <ChartLink href="https://charts.bitbo.io/power-law-oscillator/" title="Power Law Oscillator" desc="Under/oversold relative to power law fit — tops and bottoms" tag="VALUATION" />
-                <ChartLink href="https://charts.bitbo.io/nupl/" title="NUPL" desc="Net unrealized profit/loss — maps euphoria to capitulation" tag="ON-CHAIN" />
+                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/nupl/" title="NUPL" desc="Net unrealized profit/loss — maps euphoria to capitulation" tag="ON-CHAIN" />
               </div>
             </Card>
 

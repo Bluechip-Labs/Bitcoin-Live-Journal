@@ -127,6 +127,123 @@ const ChartLink = ({ href, title, desc, tag }) => (
     <span style={{ color: "#555", fontSize: 12, flexShrink: 0 }}>↗</span>
   </a>
 );
+
+// ─── BC25 Defender Index Promo ──────────────────────────────────────────────
+// Email signups go to Formspree. Replace FORMSPREE_ID with your form's ID
+// from https://formspree.io (e.g. "xpzgkqab" → the part after /f/).
+const FORMSPREE_ID = "YOUR_FORMSPREE_ID";
+const BC25_URL = "https://bc25-4907cf.webflow.io/";
+
+const BC25Promo = () => {
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState("idle"); // idle | sending | done | error
+  const [msg, setMsg] = useState("");
+
+  const submit = async (e) => {
+    e.preventDefault();
+    const trimmed = email.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmed)) {
+      setState("error"); setMsg("Please enter a valid email address.");
+      return;
+    }
+    if (FORMSPREE_ID === "YOUR_FORMSPREE_ID") {
+      setState("error"); setMsg("Signup isn't connected yet — set your Formspree ID.");
+      return;
+    }
+    setState("sending"); setMsg("");
+    try {
+      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ email: trimmed, source: "Bitcoin Live Journal", interest: "BC25 Defender Index" }),
+      });
+      if (res.ok) { setState("done"); setMsg("You're on the list — thanks for your interest in BC25."); setEmail(""); }
+      else { const d = await res.json().catch(() => ({})); throw new Error(d?.errors?.[0]?.message || "Submission failed"); }
+    } catch (err) {
+      setState("error"); setMsg(err.message || "Something went wrong. Please try again.");
+    }
+  };
+
+  return (
+    <div style={{
+      position: "relative", overflow: "hidden", borderRadius: 10,
+      border: "1px solid rgba(247,147,26,0.35)",
+      background: "linear-gradient(135deg, rgba(247,147,26,0.10) 0%, rgba(10,10,10,0.2) 55%, rgba(34,197,94,0.06) 100%)",
+      boxShadow: "0 0 40px rgba(247,147,26,0.10)", padding: 20,
+    }}>
+      {/* corner glow accent */}
+      <div style={{ position: "absolute", top: -40, right: -40, width: 140, height: 140, borderRadius: "50%", background: "radial-gradient(circle, rgba(247,147,26,0.18), transparent 70%)", pointerEvents: "none" }} />
+
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", color: "#0a0a0a", background: "#F7931A", padding: "3px 8px", borderRadius: 4, textTransform: "uppercase" }}>From Bluechip Labs</span>
+        <span style={{ fontSize: 10, color: "#888", fontFamily: "'JetBrains Mono', monospace" }}>Building in public</span>
+      </div>
+
+      <div style={{ display: "flex", gap: 20, flexWrap: "wrap", alignItems: "flex-start" }}>
+        <div style={{ flex: "1 1 320px", minWidth: 0 }}>
+          <h3 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 800, color: "#fff", letterSpacing: "-0.01em" }}>
+            BC25 <span style={{ color: "#F7931A" }}>Defender Index</span>
+          </h3>
+          <p style={{ margin: "0 0 10px", fontSize: 13, lineHeight: 1.6, color: "#bbb" }}>
+            A rules-based, treasury-first <strong style={{ color: "#ddd" }}>defensive crypto index token</strong> on Base — tracking the top ~25 assets by market cap with daily rebalancing and built-in staking rewards. Designed to weather cycles like the ones this journal tracks.
+          </p>
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 4 }}>
+            {["Top ~25 by market cap", "Daily rebalancing", "Real-yield staking", "Built on Base"].map((f, i) => (
+              <span key={i} style={{ fontSize: 11, color: "#999", display: "flex", alignItems: "center", gap: 5 }}>
+                <span style={{ color: "#22c55e", fontSize: 12 }}>✓</span>{f}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Signup — primary CTA */}
+        <div style={{ flex: "1 1 280px", minWidth: 0 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#eee", marginBottom: 8 }}>
+            Get BC25 progress updates
+          </div>
+          {state === "done" ? (
+            <div style={{ padding: "12px 14px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 6, fontSize: 12, color: "#22c55e", lineHeight: 1.5 }}>
+              ✓ {msg}
+            </div>
+          ) : (
+            <form onSubmit={submit} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <input
+                type="email" value={email} onChange={e => { setEmail(e.target.value); if (state === "error") setState("idle"); }}
+                placeholder="you@email.com" aria-label="Email address"
+                style={{
+                  flex: "1 1 160px", minWidth: 0, padding: "10px 12px", fontSize: 13,
+                  background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.14)",
+                  borderRadius: 6, color: "#fff", outline: "none", fontFamily: "inherit",
+                }}
+              />
+              <button type="submit" disabled={state === "sending"} style={{
+                padding: "10px 18px", fontSize: 13, fontWeight: 700, whiteSpace: "nowrap",
+                background: "#F7931A", color: "#0a0a0a", border: "none", borderRadius: 6,
+                cursor: state === "sending" ? "default" : "pointer", opacity: state === "sending" ? 0.7 : 1,
+              }}>
+                {state === "sending" ? "Joining…" : "Keep me posted"}
+              </button>
+            </form>
+          )}
+          {state === "error" && (
+            <div style={{ marginTop: 6, fontSize: 11, color: "#ef4444" }}>{msg}</div>
+          )}
+          <div style={{ marginTop: 8, fontSize: 11, color: "#777" }}>
+            Prefer to explore first?{" "}
+            <a href={BC25_URL} target="_blank" rel="noopener noreferrer" style={{ color: "#F7931A", textDecoration: "none", borderBottom: "1px dotted rgba(247,147,26,0.5)" }}>
+              Visit the BC25 site ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: 12, fontSize: 9, color: "#555", lineHeight: 1.5 }}>
+        BC25 is a Bluechip Labs project in pre-launch development. Not an offer to sell or solicitation to buy any token. Not financial advice.
+      </div>
+    </div>
+  );
+};
+
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
@@ -533,7 +650,7 @@ export default function BitcoinLiveJournal() {
         <div style={{ marginTop: 8, display: "flex", gap: 12, flexWrap: "wrap", fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }}>
           <ExtLink href="https://www.binance.com/en/price/bitcoin">Binance Live</ExtLink>
           <span style={{ color: "#333" }}>│</span>
-          <ExtLink href="https://www.bitcoinmagazinepro.com/charts/">BTC Mag Pro Charts</ExtLink>
+          <ExtLink href="https://www.lookintobitcoin.com/charts/">LookIntoBitcoin Charts</ExtLink>
           <span style={{ color: "#333" }}>│</span>
           <ExtLink href="https://alternative.me/crypto/fear-and-greed-index/">Fear & Greed</ExtLink>
           <span style={{ color: "#333" }}>│</span>
@@ -555,6 +672,9 @@ export default function BitcoinLiveJournal() {
         {/* ═══════════════ DASHBOARD ═══════════════ */}
         {tab === "dashboard" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+
+            <BC25Promo />
+
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <StatBox label="Days Post-Halving" value={daysSinceHalving} sub={`${monthsSinceHalving}mo`} />
               <StatBox label="Days Post-Peak" value={daysSincePeak} sub={`${monthsSincePeak}mo`} />
@@ -717,19 +837,19 @@ export default function BitcoinLiveJournal() {
 
             {/* ── Bitbo Pro Charts ── */}
             <Card>
-              <SectionTitle sub="Live professional charts from Bitbo.io — click any chart title to open full view">Professional Trading Charts</SectionTitle>
+              <SectionTitle sub="Live professional charts — click any to open the full chart in a new tab">Professional Trading Charts</SectionTitle>
               <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 14 }}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                   <ChartLink href="https://www.tradingview.com/symbols/BTCUSD/technicals/" title="Daily RSI" desc="TradingView real-time RSI & oscillators" />
-                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/macd/" title="MACD" desc="Moving average convergence/divergence" />
                   <ChartLink href="https://www.tradingview.com/symbols/BTCUSD/" title="Bollinger Bands" desc="Volatility bands on TradingView" />
-                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/200-day-moving-average-heatmap/" title="50/200 Day MAs" desc="Key moving averages with heatmap" />
-                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/200-week-moving-average-heatmap/" title="200 Week MA" desc="Long-term cycle support level" />
-                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/mayer-multiple/" title="Mayer Multiple" desc="Price relative to 200-day MA" />
-                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/pi-cycle-top-indicator/" title="Pi Cycle Top" desc="111DMA & 350DMA×2 crossover" />
+                  <ChartLink href="https://www.lookintobitcoin.com/charts/200-week-moving-average-heatmap/" title="200 Week MA Heatmap" desc="Long-term cycle support level" />
+                  <ChartLink href="https://www.lookintobitcoin.com/charts/mayer-multiple/" title="Mayer Multiple" desc="Price relative to 200-day MA" />
+                  <ChartLink href="https://www.lookintobitcoin.com/charts/pi-cycle-top-indicator/" title="Pi Cycle Top" desc="111DMA & 350DMA×2 crossover" />
                   <ChartLink href="https://charts.bitbo.io/power-law-oscillator/" title="Power Law Oscillator" desc="Under/oversold vs power law" />
-                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/mvrv-zscore/" title="MVRV Z-Score" desc="Over/undervaluation signal" />
-                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/bitcoin-drawdown-from-ath/" title="Drawdown from ATH" desc="Current % drop from all-time high" />
+                  <ChartLink href="https://www.lookintobitcoin.com/charts/mvrv-zscore/" title="MVRV Z-Score" desc="Over/undervaluation signal" />
+                  <ChartLink href="https://www.lookintobitcoin.com/charts/golden-ratio-multiplier/" title="Golden Ratio Multiplier" desc="Cycle high timing bands" />
+                  <ChartLink href="https://www.lookintobitcoin.com/charts/puell-multiple/" title="Puell Multiple" desc="Miner revenue stress indicator" />
+                  <ChartLink href="https://www.lookintobitcoin.com/charts/bitcoin-rainbow-chart/" title="Rainbow Chart" desc="Log regression valuation bands" />
                   <ChartLink href="https://www.coinglass.com/FundingRate" title="BTC Funding Rate" desc="Perpetual futures funding rates" />
                   <ChartLink href="https://www.coinglass.com/LiquidationHeatMap" title="Liquidation Heatmap" desc="Where leveraged positions cluster" />
                 </div>
@@ -801,13 +921,12 @@ export default function BitcoinLiveJournal() {
 
             {/* On-Chain Charts */}
             <Card>
-              <SectionTitle sub="Live on-chain analytics via Bitbo Charts">On-Chain Charts</SectionTitle>
+              <SectionTitle sub="Live on-chain analytics — opens in a new tab">On-Chain Charts</SectionTitle>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 <ChartLink href="https://www.blockchain.com/explorer/charts/n-transactions" title="Daily Transaction Volume" desc="Number of confirmed Bitcoin transactions per day" tag="LIVE" />
-                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/bitcoin-profitable-days/" title="Supply in Profit" desc="Percentage of circulating BTC held at a profit vs loss" />
-                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/nupl/" title="NUPL (Net Unrealized Profit/Loss)" desc="Market-wide profitability gauge — capitulation to euphoria" />
-                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/mvrv-zscore/" title="MVRV Z-Score" desc="Market value vs realized value — identifies over/undervaluation" />
-                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/puell-multiple/" title="Puell Multiple" desc="Miner revenue relative to 365-day average — miner stress indicator" />
+                <ChartLink href="https://www.lookintobitcoin.com/charts/bitcoin-profitable-days/" title="Supply in Profit" desc="Percentage of circulating BTC held at a profit vs loss" />
+                <ChartLink href="https://www.lookintobitcoin.com/charts/mvrv-zscore/" title="MVRV Z-Score" desc="Market value vs realized value — identifies over/undervaluation" />
+                <ChartLink href="https://www.lookintobitcoin.com/charts/puell-multiple/" title="Puell Multiple" desc="Miner revenue relative to 365-day average — miner stress indicator" />
                 <ChartLink href="https://charts.checkonchain.com/btconchain/unrealised/sopr_simple/sopr_simple_light.html" title="SOPR (Spent Output Profit Ratio)" desc="Are coins being sold at profit or loss? Key reversal signal" />
               </div>
             </Card>
@@ -1082,31 +1201,16 @@ export default function BitcoinLiveJournal() {
               </div>
             </Card>
 
-            {/* ── Market Indicators from Bitbo ── */}
+            {/* ── Key Indicator Charts ── */}
             <Card>
-              <SectionTitle sub="Live sentiment and on-chain indicators from Bitbo.io">Market Indicators</SectionTitle>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 14 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                  <ChartLink href="https://alternative.me/crypto/fear-and-greed-index/" title="Fear & Greed Index" desc="Live sentiment gauge — fear to greed" tag="SENTIMENT" />
-                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/nupl/" title="NUPL" desc="Net unrealized profit/loss" tag="ON-CHAIN" />
-                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/cycle-repeat/" title="Cycle Repeat Overlay" desc="Current cycle vs historical overlays" tag="CYCLE" />
-                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/bitcoin-rainbow-chart/" title="Rainbow Chart" desc="Logarithmic regression bands" tag="VALUATION" />
-                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/reserve-risk/" title="Reserve Risk" desc="Confidence vs price — buy signal indicator" tag="ON-CHAIN" />
-                  <ChartLink href="https://www.bitcoinmagazinepro.com/charts/puell-multiple/" title="Puell Multiple" desc="Miner revenue stress indicator" tag="MINING" />
-                </div>
-              </div>
-            </Card>
-
-                        {/* ── Key Indicator Charts ── */}
-            <Card>
-              <SectionTitle sub="Essential cycle and sentiment indicators via Bitbo Charts">Market Indicators</SectionTitle>
+              <SectionTitle sub="Essential cycle and sentiment indicators">Market Indicators</SectionTitle>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 <ChartLink href="https://alternative.me/crypto/fear-and-greed-index/" title="Fear & Greed Index" desc="Sentiment analysis — price colored by fear (red) vs greed (green)" tag="SENTIMENT" />
-                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/relative-strength-index/" title="Relative Strength Index (RSI)" desc="Momentum indicator — overbought vs oversold across 12-month window" tag="MOMENTUM" />
-                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/bitcoin-profitable-days/" title="Supply in Profit" desc="% of BTC supply held at a profit — key cycle position signal" tag="ON-CHAIN" />
-                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/bitcoin-power-law/" title="Power Law Model" desc="Long-term growth corridor — are we above or below fair value?" tag="VALUATION" />
+                <ChartLink href="https://www.tradingview.com/symbols/BTCUSD/technicals/" title="Relative Strength Index (RSI)" desc="Momentum indicator — overbought vs oversold" tag="MOMENTUM" />
+                <ChartLink href="https://www.lookintobitcoin.com/charts/bitcoin-profitable-days/" title="Supply in Profit" desc="% of BTC supply held at a profit — key cycle position signal" tag="ON-CHAIN" />
+                <ChartLink href="https://www.lookintobitcoin.com/charts/golden-ratio-multiplier/" title="Golden Ratio Multiplier" desc="Cycle high timing bands — are we near a top?" tag="VALUATION" />
                 <ChartLink href="https://charts.bitbo.io/power-law-oscillator/" title="Power Law Oscillator" desc="Under/oversold relative to power law fit — tops and bottoms" tag="VALUATION" />
-                <ChartLink href="https://www.bitcoinmagazinepro.com/charts/nupl/" title="NUPL" desc="Net unrealized profit/loss — maps euphoria to capitulation" tag="ON-CHAIN" />
+                <ChartLink href="https://www.lookintobitcoin.com/charts/mvrv-zscore/" title="MVRV Z-Score" desc="Market value vs realized value — over/undervaluation" tag="ON-CHAIN" />
               </div>
             </Card>
 
@@ -1207,7 +1311,7 @@ export default function BitcoinLiveJournal() {
         <p style={{ margin: 0 }}>Educational and informational purposes only. Not financial advice. Past performance ≠ future results.</p>
         <div style={{ marginTop: 6, display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", fontSize: 9 }}>
           <ExtLink href="https://www.binance.com/en/price/bitcoin">Binance</ExtLink>
-          <ExtLink href="https://www.bitcoinmagazinepro.com/charts/">BTC Mag Pro</ExtLink>
+          <ExtLink href="https://www.lookintobitcoin.com/charts/">LookIntoBitcoin</ExtLink>
           <ExtLink href="https://bitcoinfoundation.org/news/bitcoin/bitcoin-technical-analysis-btc-nears-a-make-or-break-zone-key-levels-that-could-decide-bitcoins-next-move/">BTC Foundation</ExtLink>
           <ExtLink href="https://bitcoinfoundation.org/news/crypto-companies-news/strategy-banks-btc-index/">Strategy Index</ExtLink>
           <ExtLink href="https://www.fxstreet.com/cryptocurrencies/news/bitcoin-price-forecast-btc-approaches-technical-pivot-as-soft-us-cpi-aids-recovery-202607151007">FXStreet</ExtLink>

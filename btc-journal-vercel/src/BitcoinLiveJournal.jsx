@@ -843,7 +843,7 @@ export default function BitcoinLiveJournal() {
                   <ChartLink href="https://www.tradingview.com/symbols/BTCUSD/technicals/" title="Daily RSI" desc="TradingView real-time RSI & oscillators" />
                   <ChartLink href="https://www.tradingview.com/symbols/BTCUSD/" title="Bollinger Bands" desc="Volatility bands on TradingView" />
                   <ChartLink href="https://www.lookintobitcoin.com/charts/200-week-moving-average-heatmap/" title="200 Week MA Heatmap" desc="Long-term cycle support level" />
-                  <ChartLink href="https://www.lookintobitcoin.com/charts/mayer-multiple/" title="Mayer Multiple" desc="Price relative to 200-day MA" />
+                  <ChartLink href="https://newhedge.io/bitcoin/mayer-multiple" title="Mayer Multiple" desc="Price relative to 200-day MA" />
                   <ChartLink href="https://www.lookintobitcoin.com/charts/pi-cycle-top-indicator/" title="Pi Cycle Top" desc="111DMA & 350DMA×2 crossover" />
                   <ChartLink href="https://charts.bitbo.io/power-law-oscillator/" title="Power Law Oscillator" desc="Under/oversold vs power law" />
                   <ChartLink href="https://www.lookintobitcoin.com/charts/mvrv-zscore/" title="MVRV Z-Score" desc="Over/undervaluation signal" />
@@ -851,7 +851,7 @@ export default function BitcoinLiveJournal() {
                   <ChartLink href="https://www.lookintobitcoin.com/charts/puell-multiple/" title="Puell Multiple" desc="Miner revenue stress indicator" />
                   <ChartLink href="https://www.lookintobitcoin.com/charts/bitcoin-rainbow-chart/" title="Rainbow Chart" desc="Log regression valuation bands" />
                   <ChartLink href="https://www.coinglass.com/FundingRate" title="BTC Funding Rate" desc="Perpetual futures funding rates" />
-                  <ChartLink href="https://www.coinglass.com/LiquidationHeatMap" title="Liquidation Heatmap" desc="Where leveraged positions cluster" />
+                  <ChartLink href="https://www.coinglass.com/liquidations/BTC" title="Liquidation Heatmap" desc="Where leveraged positions cluster" />
                 </div>
               </div>
             </Card>

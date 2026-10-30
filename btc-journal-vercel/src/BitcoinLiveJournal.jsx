@@ -131,7 +131,7 @@ const ChartLink = ({ href, title, desc, tag }) => (
 // ─── BC25 Defender Index Promo ──────────────────────────────────────────────
 // Email signups go to Formspree. Replace FORMSPREE_ID with your form's ID
 // from https://formspree.io (e.g. "xpzgkqab" → the part after /f/).
-const FORMSPREE_ID = "YOUR_FORMSPREE_ID";
+const FORMSPREE_ID = "mzeevlyd";
 const BC25_URL = "https://bc25-4907cf.webflow.io/";
 
 const BC25Promo = () => {
